@@ -1,0 +1,63 @@
+name: Functions deploy
+on: workflow_dispatch
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './sampleTest.py'
+  AZURE_FUNCTIONAPP_NAME: 'fnappqon2cjhwb3tz4'
+  AZURE_RESOURCEGROUP_NAME: 'satotestcd01'
+  PYTHON_VERSION: '3.8'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: deploy
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      # Python setup
+      - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Azure Login
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_FUNC_RBAC_CREDENTIALS }}
+
+      # Removing SCM firewall
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az webapp config --help
+            az webapp config access-restriction remove --action Deny -g ${{ env.AZURE_RESOURCEGROUP_NAME }} -n ${{ env.AZURE_FUNCTIONAPP_NAME }} --rule-name 'Deny ALL' --scm-site true
+
+      # Build and deploy
+      - name: 'Resolve Project Dependencies Using Pip'
+        shell: bash
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          popd
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1.3.1
+        id: fa
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+      # Enable SCM firewall
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az webapp config --help
+            az webapp config access-restriction add -g ${{ env.AZURE_RESOURCEGROUP_NAME }} -n${{ env.AZURE_FUNCTIONAPP_NAME }} --rule-name 'Deny ALL' --action Deny --ip-address '0.0.0.0/0' --priority 10 --scm-site true
+      - run: |
+          az logout
