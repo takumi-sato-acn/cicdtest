@@ -13,7 +13,7 @@ jobs:
     environment: deploy
     steps:
       - name: 'Checkout GitHub Action'
-        uses: actions/checkout@main
+        uses: actions/checkout@master
 
       # Python setup
       - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
