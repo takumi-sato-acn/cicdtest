@@ -1,16 +1,13 @@
 name: Python test
-
 on:
   push:
     branches: [master]
   pull_request:
     branches: [master]
-
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '<functions-package-path>'
   AZURE_FUNCTIONAPP_REQUIRED_PATH: '<requirements-file-path>'
   PYTHON_VERSION: '3.8'
-
 jobs:
   test:
     runs-on: ubuntu-latest
