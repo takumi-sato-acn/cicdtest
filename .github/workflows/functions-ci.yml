@@ -1,13 +1,14 @@
 name: Python test
+
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    branches: [develop, release/*, master]
+
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '<functions-package-path>'
-  AZURE_FUNCTIONAPP_REQUIRED_PATH: '<requirements-file-path>'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './sampleTest.py'
+  AZURE_FUNCTIONAPP_REQUIRED_PATH: '.'
   PYTHON_VERSION: '3.8'
+
 jobs:
   test:
     runs-on: ubuntu-latest
