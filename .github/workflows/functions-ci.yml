@@ -1,0 +1,31 @@
+name: Python test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '<functions-package-path>'
+  AZURE_FUNCTIONAPP_REQUIRED_PATH: '<requirements-file-path>'
+  PYTHON_VERSION: '3.8'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f ${{ env.AZURE_FUNCTIONAPP_REQUIRED_PATH }}/requirements.txt ]; then pip install -r ${{ env.AZURE_FUNCTIONAPP_REQUIRED_PATH }}/requirements.txt; fi
+      - name: Test with pytest
+        run: |
+          pytest ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
