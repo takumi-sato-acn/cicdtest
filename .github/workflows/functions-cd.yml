@@ -2,8 +2,8 @@ name: Functions deploy
 on: workflow_dispatch
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './deploySample.py'
-  AZURE_FUNCTIONAPP_NAME: 'satodeploytest01'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './AzureFanctionsDemo'
+  AZURE_FUNCTIONAPP_NAME: 'fnappqon2cjhwb3tz4'
   AZURE_RESOURCEGROUP_NAME: 'satotestcd01'
   PYTHON_VERSION: '3.8'
 
